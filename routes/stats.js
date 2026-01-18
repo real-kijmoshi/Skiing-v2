@@ -47,13 +47,18 @@ router.get('/leaderboard/speed', async (req, res) => {
       SELECT 
         u.id,
         u.username,
-        MAX(s.max_speed) as top_speed,
+        s.max_speed as top_speed,
         ses.name as session_name,
         ses.location
       FROM stats s
       JOIN users u ON s.user_id = u.id
       JOIN sessions ses ON s.session_id = ses.id
-      WHERE s.max_speed > 0
+      WHERE s.max_speed = (
+        SELECT MAX(s2.max_speed)
+        FROM stats s2
+        WHERE s2.user_id = u.id
+      )
+      AND s.max_speed > 0
       GROUP BY u.id
       ORDER BY top_speed DESC
       LIMIT ?

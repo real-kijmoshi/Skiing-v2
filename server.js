@@ -33,6 +33,10 @@ app.use('/api/stats', statsRouter);
 
 // Root endpoint
 app.get('/', (req, res) => {
+  const protocol = req.protocol;
+  const host = req.get('host');
+  const wsProtocol = protocol === 'https' ? 'wss' : 'ws';
+  
   res.json({
     message: 'Skiing App API Server',
     version: '1.0.0',
@@ -41,7 +45,7 @@ app.get('/', (req, res) => {
       sessions: '/api/sessions',
       positions: '/api/positions',
       stats: '/api/stats',
-      websocket: 'ws://localhost:3000'
+      websocket: `${wsProtocol}://${host}`
     }
   });
 });

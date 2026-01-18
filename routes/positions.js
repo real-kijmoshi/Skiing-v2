@@ -20,8 +20,8 @@ router.post('/', async (req, res) => {
     );
 
     // Update stats if speed is provided
-    if (speed !== undefined) {
-      await updateStats(session_id, user_id, speed, altitude);
+    if (speed !== undefined || altitude !== undefined) {
+      await updateStats(session_id, user_id, speed || 0, altitude);
     }
 
     res.status(201).json({
@@ -84,12 +84,12 @@ async function updateStats(sessionId, userId, speed, altitude) {
     if (existing) {
       // Update existing stats
       const maxSpeed = Math.max(existing.max_speed, speed);
-      const maxAltitude = altitude && existing.max_altitude 
-        ? Math.max(existing.max_altitude, altitude)
-        : altitude || existing.max_altitude;
-      const minAltitude = altitude && existing.min_altitude
-        ? Math.min(existing.min_altitude, altitude)
-        : altitude || existing.min_altitude;
+      const maxAltitude = altitude !== null && altitude !== undefined
+        ? (existing.max_altitude !== null ? Math.max(existing.max_altitude, altitude) : altitude)
+        : existing.max_altitude;
+      const minAltitude = altitude !== null && altitude !== undefined
+        ? (existing.min_altitude !== null ? Math.min(existing.min_altitude, altitude) : altitude)
+        : existing.min_altitude;
 
       await db.run(
         `UPDATE stats 
